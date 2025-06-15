@@ -34,7 +34,7 @@ class ClientIntegrationTest : public ::testing::Test {
             host_name,                           // Local hostname
             FLAGS_transfer_engine_metadata_url,  // Metadata connection string
             FLAGS_protocol, args,
-            "localhost:50051"  // Master server address
+            "localhost:50052"  // Master server address
         );
 
         EXPECT_TRUE(client_opt.has_value())

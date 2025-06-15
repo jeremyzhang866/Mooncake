@@ -28,56 +28,52 @@ class ScopedVLogTimer {
         : level_(level),
           function_name_(function_name),
           active_(VLOG_IS_ON(level_)) {
-        if (active_) {
-            start_time_ = std::chrono::steady_clock::now();
-        }
+        // if (active_) {
+        //     start_time_ = std::chrono::steady_clock::now();
+        // }
     }
 
     // Call this *after* constructing the ScopedVLogTimer
     template <typename... Args>
     void LogRequest(Args&&... args) {
-        if (active_) {
-            std::ostringstream oss;
-            (oss << ... << std::forward<Args>(args));
-            VLOG(level_) << function_name_ << " request: " << oss.str();
-        }
+        // 不再检查 active_ 开关，永远执行
+        start_time_ = std::chrono::steady_clock::now();
+        std::ostringstream oss;
+        (oss << ... << std::forward<Args>(args));
+        LOG(INFO) << function_name_ << " request: " << oss.str();
     }
 
     // Call this *before* the ScopedVLogTimer goes out of scope
     // For non-serializable types
     template <typename... Args>
     void LogResponse(Args&&... args) {
-        if (active_) {
-            auto end_time = std::chrono::steady_clock::now();
-            auto latency =
-                std::chrono::duration_cast<std::chrono::microseconds>(
-                    end_time - start_time_);
+        auto end_time = std::chrono::steady_clock::now();
+        auto latency =
+            std::chrono::duration_cast<std::chrono::microseconds>(
+                end_time - start_time_);
 
-            std::ostringstream oss;
-            (oss << ... << std::forward<Args>(args));
+        // std::ostringstream oss;
+        // (oss << ... << std::forward<Args>(args));
 
-            VLOG(level_) << function_name_ << " response: " << oss.str()
-                         << ", latency=" << latency.count() << "us";
-            logged_response_ = true;
-        }
+        LOG(INFO) << function_name_ << " response: " << ", latency=" << latency.count() << "us";
+        logged_response_ = true;
     }
 
     // For serializable types
     template <typename T>
     void LogResponseJson(const T& obj) {
-        if (active_) {
-            auto end_time = std::chrono::steady_clock::now();
-            auto latency =
-                std::chrono::duration_cast<std::chrono::microseconds>(
-                    end_time - start_time_);
+        auto end_time = std::chrono::steady_clock::now();
+        auto latency =
+            std::chrono::duration_cast<std::chrono::microseconds>(
+                end_time - start_time_);
 
-            std::string json;
-            struct_json::to_json(obj, json);
+        // std::string json;
+        // struct_json::to_json(obj, json);
 
-            VLOG(level_) << function_name_ << " response: " << json
-                         << ", latency=" << latency.count() << "us";
-            logged_response_ = true;
-        }
+        LOG(INFO) << function_name_ << " response: "
+                        << ", latency=" << latency.count() << "us";
+        logged_response_ = true;
+
     }
 
     // Destructor logs *only* latency if LogResponse wasn't called
