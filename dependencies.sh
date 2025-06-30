@@ -148,7 +148,7 @@ fi
 
 # Clone yalantinglibs
 echo "Cloning yalantinglibs from ${GITHUB_PROXY}/alibaba/yalantinglibs.git"
-git clone ${GITHUB_PROXY}/alibaba/yalantinglibs.git
+git clone https://gitee.com/kimmyzhang1231/yalantinglibs.git
 check_success "Failed to clone yalantinglibs"
 
 # Build and install yalantinglibs
